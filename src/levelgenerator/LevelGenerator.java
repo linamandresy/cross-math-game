@@ -41,9 +41,9 @@ public class LevelGenerator {
 
     private LevelModel generateBoard(int w, int h, int maxNumber, int countTries) {
         LevelModel result = null;
-        while (result==null) {
+        while (countTries > 0) {
             LevelModel levelModel = generateBoard(w, h, maxNumber);
-            if (containsEql(levelModel))
+            if ((result == null || result.getGridIndexes().size() < levelModel.getGridIndexes().size()) && containsEql(levelModel))
                 result = levelModel;
 
             countTries--;
