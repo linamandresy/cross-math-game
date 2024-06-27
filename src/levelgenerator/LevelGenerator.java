@@ -23,7 +23,7 @@ public class LevelGenerator {
     private List<Integer> _signs2 = new LinkedList<Integer>(Arrays.asList(SignDiv, SignMul));
 
     public LevelModel generate() {
-        LevelModel levelModel = generateBoard(Constante.TAILLE_GRILLE, Constante.TAILLE_GRILLE, 200, 20);
+        LevelModel levelModel = generateBoard(Constante.TAILLE_GRILLE, Constante.TAILLE_GRILLE, Constante.MAX_NUMBER, 20);
         levelModel.cellToPocket(90, 0);
         return levelModel;
     }
