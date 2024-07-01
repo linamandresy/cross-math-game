@@ -141,7 +141,7 @@ public class LevelGenerator {
                     else if (sign == SignMul)
                         sum *= number;
                     else if (sign == SignDiv) {
-                        if (sum % number == 0)
+                        if (number!=0 &&  sum % number == 0)
                             sum = sum / number;
                         else
                             sum = 0;
