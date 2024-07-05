@@ -5,6 +5,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
+
 import logic.basic.Vector2Int;
 
 public class LevelModel {
@@ -129,5 +133,77 @@ public class LevelModel {
             }
             // _lines.clear();
         }
+    }
+    public boolean isOperationCorrect(String operation){
+        operation = operation.replaceAll("x", "*");
+        String[] parts = operation.split("=");
+        if(parts.length!=2) return false;
+        String expression = parts[0].trim().replaceAll(" ", "");
+        String expressionResult=parts[1].trim().replaceAll(" ", "");
+        ScriptEngineManager manager = new ScriptEngineManager();
+        ScriptEngine engine = manager.getEngineByName("JavaScript");
+        try{
+            Object resultRight = engine.eval(expression);
+            Object resultLeft = engine.eval(expressionResult);
+            if(resultRight instanceof Number && resultLeft instanceof Number){
+                return Math.abs(((Number)resultRight).doubleValue()-((Number)resultLeft).doubleValue())<1e-9;
+            } 
+            return false;
+        }catch(ScriptException e){
+            return false;
+        }
+    }
+
+    public boolean checkAllOperationCorrect(String[][] data){
+        String[] operations = getAllOperations(data);
+        for (String operation : operations) {
+            if(!isOperationCorrect(operation)) {
+                System.out.println(operation);
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public String[] getAllOperations(String[][] data){
+        List<List<Cell>> operationsIndexes = this.get_lines();
+        int n =operationsIndexes.size();
+        String[] result = new String[n];
+        for (int i = 0; i < n ; i++) {
+            List<Cell> ligne = operationsIndexes.get(i);
+            int tailleLigne = ligne.size();
+            String operation = "";
+            for (int j = 0; j < tailleLigne; j++) {
+                Cell cell = ligne.get(j);
+                operation= operation.concat(getValueByIndex(cell.getCorrectIndex().getX(), cell.getCorrectIndex().getY(), data));
+            }
+            result[i] = operation;
+        }
+
+        return result;
+    }
+
+    public String generateJson(){
+        String result = "[";
+        List<Cell> cells = this.getBoardCells();
+        for (Cell cell : cells) {
+            String info = "["+cell.getCorrectIndex().getX()+","+cell.getCorrectIndex().getY()+",\""+cell.getValueString()+"\"],";
+            result=result.concat(info);
+        }
+        cells = this.getPocketCells();
+        for (Cell cell : cells) {
+            String info = "["+cell.getCorrectIndex().getX()+","+cell.getCorrectIndex().getY()+",\""+cell.getValueString()+"\"],";
+            result=result.concat(info);
+        }
+        result = result.substring(0,result.length()-1).concat("]");
+        return result;     
+    }
+    public String getValueByIndex(int x , int y ,String[][] data){
+        for (int i = 0; i < data.length; i++) {
+            if(Integer.valueOf(data[i][0]).intValue()==x && Integer.valueOf(data[i][1]).intValue()==y){
+                return data[i][2];
+            }
+        }
+        return "";
     }
 }
